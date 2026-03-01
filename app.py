@@ -61,6 +61,10 @@ st.markdown("""
 
 # Sidebar
 with st.sidebar:
+    dev_mode = st.toggle("🔧 Developer Mode", value=False)
+    st.caption("_View generated SQL and raw data_")
+    
+    st.divider()
     st.markdown("### 📊 What I Know")
     st.markdown("""
     **Demographics**
@@ -89,9 +93,6 @@ with st.sidebar:
     if st.button("🗑️ Clear Chat", use_container_width=True, type="secondary"):
         st.session_state.messages = []
         st.rerun()
-    
-    st.divider()
-    dev_mode = st.toggle("🔧 Developer Mode", value=False, help="Show query details and raw data")
     
     st.caption("🔮 DataPulse · Powered by Snowflake Cortex")
 
