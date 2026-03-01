@@ -100,17 +100,8 @@ See [Development Process](docs/DEVELOPMENT.md#testing-methodology) for detailed 
 | LLM | Snowflake Cortex AI |
 | Data | SafeGraph US Open Census (2019-2020) |
 
-
 ## **Local setup guide:** 
 [docs/LOCAL_SETUP.md](docs/LOCAL_SETUP.md)
-
-## Sample Questions
-
-- "What's the population of California?"
-- "Which state has the highest median income?"
-- "Compare Texas and Florida on housing and employment"
-- "What's the poorest state and county? Is the poorest county in the poorest state?"
-- "Why does West Virginia have low income compared to other states?"
 
 ## Documentation
 
@@ -140,12 +131,6 @@ See [Development Process](docs/DEVELOPMENT.md#testing-methodology) for detailed 
 ├── docs/                  # Documentation
 └── requirements.txt
 ```
-
-## Data Coverage
-
-- **Geographic Levels:** States and Counties (no city-level data)
-- **Time Period:** 2019 and 2020
-- **Metrics:** Population, income, housing, education, employment, poverty
 
 ## License
 
