@@ -34,3 +34,4 @@ cursor_plans/
 # Test files (can include if desired)
 # stress_test.py
 # integration_test.py
+tests/*.md

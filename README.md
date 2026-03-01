@@ -79,6 +79,17 @@ User Question
 
 All data stays within Snowflake — nothing leaves the platform.
 
+## Quality Assurance
+
+The system includes a comprehensive test suite covering:
+
+- **Guardrails** — Off-topic detection, prompt injection, unsafe content, unanswerable queries
+- **Robustness** — Typos, ambiguity resolution, calculations, negation handling
+- **Answer Quality** — Factual accuracy, response formatting, hallucination prevention
+- **Context Retention** — Multi-turn conversation handling
+
+See [Development Process](docs/DEVELOPMENT.md#testing-methodology) for detailed methodology and results.
+
 ## Tech Stack
 
 | Component | Technology |
@@ -121,6 +132,9 @@ All data stays within Snowflake — nothing leaves the platform.
 ├── db/
 │   ├── snowflake_client.py # Database connection
 │   └── setup_views.sql    # LLM-optimized views
+├── tests/
+│   ├── test_cases_v2.json # Test suite definitions
+│   └── quality_test_v2.py # Test runner
 ├── scripts/
 │   └── 01_snowflake_setup.sql
 ├── docs/                  # Documentation

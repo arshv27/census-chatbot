@@ -165,6 +165,11 @@ for message in st.session_state.messages:
 
 # Chat input
 if prompt := st.chat_input("Ask about US Census data..."):
+    # Validate input
+    if not prompt.strip():
+        st.warning("Please enter a question about census data.")
+        st.stop()
+    
     # Clear welcome section immediately
     welcome_container.empty()
     

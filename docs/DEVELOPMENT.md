@@ -203,3 +203,51 @@ Tested different models for different tasks (limited to [models available in Sno
 | Synthesis | Claude 3.5 Sonnet | Best conversational quality available in Cortex |
 
 Using the best model for each task optimizes both quality and cost.
+
+---
+
+## Testing Methodology
+
+Systematic validation across multiple dimensions to ensure production readiness.
+
+### Test Categories
+
+| Category | Description | Test Count |
+|----------|-------------|------------|
+| **Guardrails** | Off-topic, prompt injection, unsafe content, unanswerable, SQL injection | 22 |
+| **Robustness** | Typos, ambiguity, calculations, negation, year filters, ordinals, boundaries | 20 |
+| **Answer Quality** | Basic lookups, comparisons, rankings | 7 |
+| **Hallucination** | Fact verification against ground truth, made-up data rejection | 10 |
+| **Context Retention** | Multi-turn conversations with pronoun resolution | 3 conversations |
+| **Multi-Part** | Complex questions requiring multiple SQL queries | 3 |
+
+**Automated Checks:**
+- Action classification (QUERY/REJECT/REASONING)
+- Response content verification
+- SQL injection pattern detection
+- Hallucination prevention (rejection of unavailable data)
+
+**Manual Review Flags:**
+- Response quality and tone
+- Context resolution accuracy
+- Calculation correctness
+
+### Results Summary
+
+| Category | Pass Rate |
+|----------|-----------|
+| Off-topic Detection | 100% |
+| Prompt Injection | 100% |
+| Unsafe Content | 100% |
+| Unanswerable Queries | 100% |
+| SQL Injection Prevention | 100% |
+| Answer Quality | 100% |
+| Made-up Data Rejection | 100% |
+| Robustness | All tests executed without errors |
+
+**Key Validations:**
+- Typos ("Califronia", "Texass") correctly resolved to intended states
+- Ambiguous terms ("Washington", "Georgia") correctly interpreted as US states
+- Multi-part questions generate appropriate multiple SQL queries
+- Context retained across 10 conversation turns
+- Prompt injection attempts (DAN, system overrides) correctly rejected
