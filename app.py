@@ -144,24 +144,38 @@ for message in st.session_state.messages:
         
         if message["role"] == "assistant" and st.session_state.dev_mode and "debug" in message:
             debug = message["debug"]
-            with st.expander("🔧 Technical Details", expanded=False):
-                if debug.get("standalone_query"):
-                    st.caption("**Interpreted as:**")
-                    st.info(debug["standalone_query"])
-                if debug.get("sql"):
-                    sql_queries = [q.strip() for q in debug["sql"].split("---SQL---") if q.strip()]
-                    if len(sql_queries) > 1:
-                        st.caption(f"**SQL Queries ({len(sql_queries)} queries):**")
-                        for i, q in enumerate(sql_queries, 1):
-                            st.text(f"Query {i}:")
-                            st.code(q, language="sql")
-                    else:
-                        st.caption("**SQL Query:**")
-                        st.code(debug["sql"], language="sql")
-                if debug.get("sql_results"):
-                    st.caption("**Raw Results:**")
-                    results = debug["sql_results"]
-                    st.text(results[:600] + "..." if len(results) > 600 else results)
+            # Show panel for both queries and rejections
+            if debug.get("sql") or debug.get("action") == "REJECT":
+                with st.expander("🔧 Technical Details", expanded=False):
+                    # Show classification decision
+                    if debug.get("action"):
+                        st.caption("**Classification:**")
+                        action_display = debug["action"]
+                        reason_display = debug.get("reason", "")
+                        if action_display == "REJECT":
+                            st.error(f"Action: {action_display} — Reason: {reason_display}")
+                        elif action_display == "REASONING":
+                            st.warning(f"Action: {action_display} — Analytical question requiring data interpretation")
+                        else:
+                            st.success(f"Action: {action_display}")
+                    
+                    if debug.get("standalone_query"):
+                        st.caption("**Interpreted as:**")
+                        st.info(debug["standalone_query"])
+                    if debug.get("sql"):
+                        sql_queries = [q.strip() for q in debug["sql"].split("---SQL---") if q.strip()]
+                        if len(sql_queries) > 1:
+                            st.caption(f"**SQL Queries ({len(sql_queries)} queries):**")
+                            for i, q in enumerate(sql_queries, 1):
+                                st.text(f"Query {i}:")
+                                st.code(q, language="sql")
+                        else:
+                            st.caption("**SQL Query:**")
+                            st.code(debug["sql"], language="sql")
+                    if debug.get("sql_results"):
+                        st.caption("**Raw Results:**")
+                        results = debug["sql_results"]
+                        st.text(results[:600] + "..." if len(results) > 600 else results)
 
 # Chat input
 if prompt := st.chat_input("Ask about US Census data..."):
@@ -216,6 +230,8 @@ if prompt := st.chat_input("Ask about US Census data..."):
             
             debug_info["standalone_query"] = standalone_query
             debug_info["sql"] = generated_sql
+            debug_info["action"] = action
+            debug_info["reason"] = parsed.get("reason", "")
             
             if action == "REJECT":
                 reason = parsed.get("reason", "").upper()
@@ -298,9 +314,21 @@ if prompt := st.chat_input("Ask about US Census data..."):
         # Replace status with final response (using the same placeholder)
         status_placeholder.markdown(escape_markdown(response))
         
-        # Dev mode panel
-        if st.session_state.dev_mode and debug_info.get("sql"):
+        # Dev mode panel - show for both successful queries AND rejections
+        if st.session_state.dev_mode and (debug_info.get("sql") or debug_info.get("action") == "REJECT"):
             with st.expander("🔧 Technical Details", expanded=False):
+                # Show classification decision
+                if debug_info.get("action"):
+                    st.caption("**Classification:**")
+                    action_display = debug_info["action"]
+                    reason_display = debug_info.get("reason", "")
+                    if action_display == "REJECT":
+                        st.error(f"Action: {action_display} — Reason: {reason_display}")
+                    elif action_display == "REASONING":
+                        st.warning(f"Action: {action_display} — Analytical question requiring data interpretation")
+                    else:
+                        st.success(f"Action: {action_display}")
+                
                 if debug_info.get("standalone_query"):
                     st.caption("**Interpreted as:**")
                     st.info(debug_info["standalone_query"])
