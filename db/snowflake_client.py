@@ -60,15 +60,8 @@ def _get_credentials() -> dict:
 
 
 @st.cache_resource(show_spinner=False)
-def get_connection():
-    """
-    Establish and cache a Snowflake connection.
-    
-    Uses Streamlit's cache_resource to maintain a single connection
-    across all reruns, eliminating repeated connection overhead (~2-4s savings).
-    
-    Also sets a session timeout as a safety net against expensive runaway queries.
-    """
+def _create_connection():
+    """Create a new Snowflake connection."""
     creds = _get_credentials()
     conn = snowflake.connector.connect(
         account=creds["account"],
@@ -83,6 +76,31 @@ def get_connection():
     cursor.execute("ALTER SESSION SET STATEMENT_TIMEOUT_IN_SECONDS = 30")
     cursor.close()
     return conn
+
+
+def get_connection():
+    """
+    Get a valid Snowflake connection, reconnecting if the session expired.
+    
+    Handles authentication token expiration by clearing the cache
+    and creating a fresh connection.
+    """
+    conn = _create_connection()
+    
+    # Test if connection is still valid
+    try:
+        cursor = conn.cursor()
+        cursor.execute("SELECT 1")
+        cursor.close()
+        return conn
+    except (ProgrammingError, DatabaseError) as e:
+        error_msg = str(e)
+        # Check for auth expiration or connection issues
+        if "expired" in error_msg.lower() or "authenticate" in error_msg.lower() or "connection" in error_msg.lower():
+            # Clear cached connection and create new one
+            _create_connection.clear()
+            return _create_connection()
+        raise
 
 
 def _validate_query(query: str) -> Optional[str]:
