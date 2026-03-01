@@ -60,8 +60,9 @@ Generate Snowflake SQL following these rules:
 - Use fully qualified names: CENSUS_APP_DB.LLM_VIEWS.V_STATE_DEMOGRAPHICS or V_COUNTY_DEMOGRAPHICS
 - ALL column names in double quotes: "Total_Population", "State_Name", "Year", etc.
 - Include BOTH years (2019 and 2020) by default - do NOT filter by year unless user specifically asks for a single year
-- For "highest/lowest/most" questions → ORDER BY ... LIMIT 10 (not LIMIT 1!)
-- For specific lookups → LIMIT 50
+- For "top/highest/lowest" rankings → ORDER BY [metric] DESC/ASC LIMIT 10
+- For STATE queries → No LIMIT needed (only ~104 rows total)
+- For COUNTY queries without specific ordering → ORDER BY RANDOM() LIMIT 100 (representative sample)
 - Use ILIKE for string matching
 - DATA LEVELS: We have STATE and COUNTY data only. NO CITY DATA EXISTS.
 
