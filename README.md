@@ -35,8 +35,6 @@ The raw data contains Census Block Group level statistics from the American Comm
 
 **Time Period:** 2019 and 2020
 
-**Limitation:** No city-level data available — only states and counties.
-
 ## Architecture
 
 DataPulse uses a **2-call LLM architecture** optimized for cost and latency:
@@ -77,8 +75,6 @@ User Question
 3. **Execute** → Against pre-aggregated Census views in Snowflake
 4. **Synthesize** → Natural language answer
 
-All data stays within Snowflake — nothing leaves the platform.
-
 ## Quality Assurance
 
 The system includes a comprehensive test suite covering:
@@ -89,16 +85,6 @@ The system includes a comprehensive test suite covering:
 - **Context Retention** — Multi-turn conversation handling
 
 See [Development Process](docs/DEVELOPMENT.md#testing-methodology) for detailed methodology and results.
-
-## Tech Stack
-
-| Component | Technology |
-|-----------|------------|
-| Frontend | Streamlit |
-| Backend | Python |
-| Database | Snowflake |
-| LLM | Snowflake Cortex AI |
-| Data | SafeGraph US Open Census (2019-2020) |
 
 ## **Local setup guide:** 
 [docs/LOCAL_SETUP.md](docs/LOCAL_SETUP.md)
