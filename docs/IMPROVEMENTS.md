@@ -68,31 +68,6 @@ Extend the agent to fetch real-time data from external sources.
 
 ---
 
-## Data Visualization
-
-### Interactive Charts
-Present analysis visually instead of text-only responses.
-
-**Visualizations to Add:**
-- **Bar charts** — State/county comparisons
-- **Line charts** — Year-over-year trends (2019 vs 2020, extensible to more years)
-- **Choropleth maps** — Geographic distribution using Plotly
-- **Scatter plots** — Correlation analysis (education vs income)
-
-**Implementation:**
-```python
-import plotly.express as px
-
-# Example: Income comparison
-fig = px.bar(df, x='State_Name', y='Median_Household_Income', 
-             title='Median Income by State')
-st.plotly_chart(fig)
-```
-
-**Trigger:** Detect comparison/trend questions and auto-generate appropriate chart alongside text response.
-
----
-
 ## Reliability & Error Handling
 
 ### Retry Logic with Backoff
@@ -147,30 +122,6 @@ Cache frequent queries to reduce latency and cost.
 
 ---
 
-## Voice Support (Ambitious)
-
-### Speech-to-Text Input
-Allow users to ask questions verbally.
-
-**Implementation:**
-- Use Web Speech API (browser-native) or Whisper API
-- Stream audio → transcribe → process as text
-- Indicate "listening" state in UI
-
-```javascript
-// Browser Speech API
-const recognition = new webkitSpeechRecognition();
-recognition.onresult = (event) => {
-    const transcript = event.results[0][0].transcript;
-    sendToBackend(transcript);
-};
-```
-
-### Text-to-Speech Output (Optional)
-Read responses aloud for accessibility.
-
----
-
 ## Additional Enhancements
 
 ### Response Streaming
@@ -188,28 +139,15 @@ Let users rate responses to improve prompts over time.
 - Log feedback with query/response pairs
 - Periodic prompt refinement based on negative feedback patterns
 
-### Admin Dashboard
-Monitor system health and usage patterns.
-
-**Metrics to Track:**
-- Queries per day/hour
-- Average response time
-- Error rates by type
-- Most common question categories
-- LLM token usage and costs
-
----
-
 ## Summary Table
 
 | Improvement | Effort | Impact |
 |-------------|--------|--------|
 | User login | Medium | High |
 | Multi-session support | Medium | High |
-| Data visualizations | Low | High |
 | Retry logic | Low | Medium |
 | External tool integration | High | High |
 | Async processing | Medium | Medium |
 | Query caching | Low | Medium |
-| Voice support | High | Medium |
 | Response streaming | Medium | High |
+| Feedback loop | Medium | High |
