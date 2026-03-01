@@ -1,0 +1,142 @@
+# 🔮 DataPulse
+
+**An AI-powered conversational interface for exploring US Census data**
+
+Built with Snowflake Cortex AI and Streamlit.
+
+## Live Demo
+
+🌐 **URL:** [https://census-chatbot.streamlit.app](https://census-chatbot.streamlit.app)
+
+## Features
+
+- **Natural Language Queries** — Ask questions in plain English about US demographics
+- **Multi-Part Questions** — Complex questions automatically split into multiple queries
+- **Conversation Context** — Follow-up questions work naturally
+- **Data Reasoning** — Analytical "why" questions get thoughtful analysis
+- **Smart Guardrails** — Off-topic and unanswerable questions handled gracefully
+
+## Dataset
+
+**Source:** [SafeGraph US Open Census](https://www.safegraph.com/open-census-data) via Snowflake Marketplace
+
+The raw data contains Census Block Group level statistics from the American Community Survey. For this application, we aggregate it into two LLM-optimized views:
+
+| View | Granularity | Records |
+|------|-------------|---------|
+| `V_STATE_DEMOGRAPHICS` | State/Territory | 52 × 2 years |
+| `V_COUNTY_DEMOGRAPHICS` | County | ~1,955 × 2 years |
+
+**Available Metrics:**
+- **Demographics:** Population, median age
+- **Economics:** Household income, per capita income, poverty rates, unemployment
+- **Housing:** Home values, rent prices, housing units
+- **Education:** Bachelor's, Master's, Doctorate holders (state level only)
+
+**Time Period:** 2019 and 2020
+
+**Limitation:** No city-level data available — only states and counties.
+
+## Architecture
+
+DataPulse uses a **2-call LLM architecture** optimized for cost and latency:
+
+```
+User Question
+     │
+     ▼
+┌─────────────────────────────────────────────────────────┐
+│  CALL 1: Unified Agent (Mistral Large 2)                │
+│  ┌─────────────┬─────────────────┬──────────────────┐   │
+│  │ Guardrails  │ Context         │ SQL Generation   │   │
+│  │ (safe/topic)│ Resolution      │ (Text-to-SQL)    │   │
+│  └─────────────┴─────────────────┴──────────────────┘   │
+│  Output: {action, reason, resolved_question, sql}       │
+└─────────────────────────────────────────────────────────┘
+     │
+     ▼
+┌─────────────────────────────────────────────────────────┐
+│  Snowflake Query Execution                              │
+│  Execute SQL against V_STATE_DEMOGRAPHICS /             │
+│  V_COUNTY_DEMOGRAPHICS views                            │
+└─────────────────────────────────────────────────────────┘
+     │
+     ▼
+┌─────────────────────────────────────────────────────────┐
+│  CALL 2: Synthesis (Claude 3.5 Sonnet)                  │
+│  Transform raw data → natural, conversational response  │
+└─────────────────────────────────────────────────────────┘
+     │
+     ▼
+  Response
+```
+
+**Data Flow:**
+1. **Classify** → QUERY / REASONING / REJECT
+2. **Generate SQL** → One or multiple queries (complex questions auto-split)
+3. **Execute** → Against pre-aggregated Census views in Snowflake
+4. **Synthesize** → Natural language answer
+
+All data stays within Snowflake — nothing leaves the platform.
+
+## Tech Stack
+
+| Component | Technology |
+|-----------|------------|
+| Frontend | Streamlit |
+| Backend | Python |
+| Database | Snowflake |
+| LLM | Snowflake Cortex AI |
+| Data | SafeGraph US Open Census (2019-2020) |
+
+
+## **Local setup guide:** 
+[docs/LOCAL_SETUP.md](docs/LOCAL_SETUP.md)
+
+## Sample Questions
+
+- "What's the population of California?"
+- "Which state has the highest median income?"
+- "Compare Texas and Florida on housing and employment"
+- "What's the poorest state and county? Is the poorest county in the poorest state?"
+- "Why does West Virginia have low income compared to other states?"
+
+## Documentation
+
+| Document | Description |
+|----------|-------------|
+| [Development Process](docs/DEVELOPMENT.md) | How this project was built |
+| [Local Setup](docs/LOCAL_SETUP.md) | Installation and configuration guide |
+| [Future Improvements](docs/IMPROVEMENTS.md) | Ideas for enhancing the project |
+
+## Project Structure
+
+```
+├── app.py                 # Streamlit frontend
+├── ai/
+│   ├── cortex_llm.py      # Snowflake Cortex wrapper
+│   └── prompts.py         # LLM prompt templates
+├── agent/
+│   └── chat_agent.py      # Agent orchestration
+├── db/
+│   ├── snowflake_client.py # Database connection
+│   └── setup_views.sql    # LLM-optimized views
+├── scripts/
+│   └── 01_snowflake_setup.sql
+├── docs/                  # Documentation
+└── requirements.txt
+```
+
+## Data Coverage
+
+- **Geographic Levels:** States and Counties (no city-level data)
+- **Time Period:** 2019 and 2020
+- **Metrics:** Population, income, housing, education, employment, poverty
+
+## License
+
+This project is licensed under the MIT License — see the [LICENSE](LICENSE) file for details.
+
+## Author
+
+[**Arsh Verma**](https://arshv27.github.io)
